@@ -1,3 +1,16 @@
+Let's try to run it on iOS!
+
+```bash
+rustup target add aarch64-apple-ios armv7-apple-ios armv7s-apple-ios x86_64-apple-ios i386-apple-ios
+
+# 1.
+cargo lipo --release
+
+# 2. Open and build the xcode project
+```
+
+and it seems to work.
+
 # Full Node
 
 > Just because you call something a blockchain, that doesn't mean you aren't subject to normal engineering laws.
