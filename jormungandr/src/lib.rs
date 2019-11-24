@@ -91,8 +91,10 @@ pub mod utils;
 
 use stats_counter::StatsCounter;
 
-fn start() -> Result<(), start_up::Error> {
-    let initialized_node = initialize_node()?;
+use std::ffi::{CString};
+
+fn start(args: String) -> Result<(), start_up::Error> {
+    let initialized_node = initialize_node(args)?;
 
     let bootstrapped_node = bootstrap(initialized_node)?;
 
@@ -396,9 +398,18 @@ pub struct InitializedNode {
     pub services: Services,
 }
 
-fn initialize_node() -> Result<InitializedNode, start_up::Error> {
-    let command_line = CommandLine::load();
+use std::string::{ToString, String};
 
+fn initialize_node(args: String) -> Result<InitializedNode, start_up::Error> {
+
+    eprintln!("cString: {:?}", args);
+
+    let mut v = args.split(' ');
+
+    eprintln!("split: {:?}", v);
+    let command_line: CommandLine = structopt::StructOpt::from_iter(v);
+
+    eprintln!("command_line: {:?}", command_line);
     if command_line.full_version {
         println!("{}", env!("FULL_VERSION"));
         std::process::exit(0);
@@ -470,10 +481,16 @@ fn initialize_node() -> Result<InitializedNode, start_up::Error> {
     })
 }
 
-fn main() {
+use std::ffi::CStr;
+#[no_mangle]
+pub extern "C" fn jormungandr_main(c_buf: *const i8) {
     use std::error::Error;
 
-    if let Err(error) = start() {
+    let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
+    let str_slice: &str = c_str.to_str().unwrap();
+    let str_buf: String = str_slice.to_owned();
+
+    if let Err(error) = start(str_buf) {
         eprintln!("{}", error);
         let mut source = error.source();
         while let Some(err) = source {

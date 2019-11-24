@@ -11,6 +11,9 @@ Midgard Serpent
 """
 edition = "2018"
 
+[lib]
+crate-type = ["staticlib"]
+
 [dependencies]
 actix-net = "0.2.6"
 actix-threadpool = "0.1.2"
